@@ -25,7 +25,7 @@ void Schema::getSchemaInput(){
     std::getline(fin, schemaName, '('); //Retrieves the name of the Schema
     do{
         schemaList.push_back(tempVar);
-        if(i % 2 == 0){
+        if(i % 2 == 0){ //Gets the name of the variable up until ':'
             std::getline(fin, next, ':');
             schemaList[i/2].varName = next;
         }

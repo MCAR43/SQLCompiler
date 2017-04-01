@@ -3,12 +3,11 @@
 
 int main(){
     std::vector<Schema> tempSchemas;
+    std::string next;
     Schema tempSchema;
     tempSchemas.push_back(tempSchema);
-    do{
-        
 
-    } while(next != 'SELECT');
-
+    Query testquery;
+    testquery.getQuery();
     return 0;
 }

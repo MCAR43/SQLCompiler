@@ -6,7 +6,21 @@ Query::Query(){
     std::getline(fin, raw_query, ';');
 }
 
-void Query::processQuery(){
-    //We want to process in the order FROM -> WHERE -> SELECT
+bool Query::endOfQuery(const string stringToCheck){
+    for(int i = 0; i < stringToCheck.length(); i++){
+        if(stringToCheck[i] == ';')
+            return true;
+
+    }
+    return false;
+
+}
+
+void Query::getQuery(){
     
+
+    std::istringstream stringstream(raw_query);
+    std::getline(stringstream, SELECTION, '\n');
+    std::getline(stringstream, FROM, '\n');
+    std::getline(stringstream, WHERE, '\n'); 
 }
