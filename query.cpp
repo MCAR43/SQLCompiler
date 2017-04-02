@@ -4,6 +4,7 @@ Query::Query(){
     fin.clear();
     fin.open(INPUTFILESQL.c_str());
     std::getline(fin, raw_query, ';');
+    raw_query.push_back(';');
 }
 
 bool Query::endOfQuery(const string stringToCheck){
@@ -17,10 +18,35 @@ bool Query::endOfQuery(const string stringToCheck){
 }
 
 void Query::getQuery(){
-    
+    std::istringstream iss(raw_query);
+    int newlineCounter = 0;
+    bool loopCondition = false;
+    string next;
+    do{
+        if(newlineCounter == 0){
+            std::getline(iss, SELECTION, '\n');
+            next = SELECTION;
+        }
+        else if(newlineCounter == 1){
+            std::getline(iss, FROM, '\n');
+            next = FROM;
+        }
+        else if(newlineCounter == 2){
+            std::getline(iss, WHERE, '\n');
+            next = WHERE;
+        }
+        newlineCounter++;
+            
 
-    std::istringstream stringstream(raw_query);
-    std::getline(stringstream, SELECTION, '\n');
-    std::getline(stringstream, FROM, '\n');
-    std::getline(stringstream, WHERE, '\n'); 
+        
+    } while(!endOfQuery(next));
+
+}
+
+void Query::processSelect(){
+
+}
+
+Selection::Selection(){
+    std::cout << selectionSymbol;
 }

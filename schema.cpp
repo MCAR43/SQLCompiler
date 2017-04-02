@@ -27,11 +27,11 @@ void Schema::getSchemaInput(){
         schemaList.push_back(tempVar);
         if(i % 2 == 0){ //Gets the name of the variable up until ':'
             std::getline(fin, next, ':');
-            schemaList[i/2].varName = next;
+            schemaList[i >> 1].varName = next;
         }
         else {
             std::getline(fin, next, ',');
-            schemaList[i/2].varType = next;
+            schemaList[i >> 1].varType = next;
         }
         i++;
     } while(!endOfSchema(next));
