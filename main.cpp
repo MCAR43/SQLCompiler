@@ -8,6 +8,7 @@ int main(){
     tempSchemas.push_back(tempSchema);
 
     Query testquery;
-    testquery.getQuery();
+    //testquery.getQuery();
+    testquery.getRelationalAlgebra();
     return 0;
 }
