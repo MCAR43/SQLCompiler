@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
-#include <algorithm>
+#include "schema.h"
 using std::string;
 const string INPUTFILESQL = "testinputSQL.dat";
 const string KEYWORDS[18] = {"SELECT", "FROM", "WHERE", "AND", "AS", "INTERSECT", "UNION", "IN", "GROUP BY", "MAX", "MIN",
@@ -29,10 +29,10 @@ public:
     Query();
     void getQuery();
     bool endOfQuery(const string stringToCheck, const char charToEnd);
-    void getRelationalAlgebra();
     void Algebra();
     void print();
-    void printVector();
+    void printTree(const string toPrint);
+    void queryTree(std::vector<Schema> schema);
     bool checkKeywords(const string keyword);
     WHERE whereStatement;
     FROM fromStatement;

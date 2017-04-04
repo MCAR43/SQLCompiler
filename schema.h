@@ -21,6 +21,7 @@ class Schema{
 public:
     Schema();
     void getSchemaInput();
+    string getSchemaName();
     bool endOfSchema(const string stringToCheck);
 private:
     string testVar;

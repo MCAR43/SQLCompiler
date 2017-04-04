@@ -37,3 +37,7 @@ void Schema::getSchemaInput(){
     } while(!endOfSchema(next));
 
 }
+
+string Schema::getSchemaName(){
+    return schemaName;
+}

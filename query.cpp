@@ -38,203 +38,139 @@ void Query::getQuery(){
         if(newlineCounter == 0){
             std::getline(iss,selectLine, '\n');
             std::istringstream selectStream(selectLine);
-            std::getline(selectStream, trashString, ' ');
-            do{
-              std::getline(selectStream, next, ' ');
+            std::getline(selectStream, next, ' ');
+            while(selectStream >> next){
               selectStatement.arguments.push_back(next);
-              embeddedCounter++;
-            } while(selectStream) ;
+            }
         }
         else if(newlineCounter == 1){
             std::getline(iss,fromLine, '\n');
             std::istringstream fromStream(fromLine);
             std::getline(fromStream, next, ' ');
             fromStatement.arguments.push_back(next);
-            do{
-              std::getline(fromStream, next, ',');
+            while(fromStream >> next){
               fromStatement.arguments.push_back(next);
-            } while(fromStream);
+            }
         }
         else if(newlineCounter == 2){
             std::getline(iss,whereLine, '\n');
             std::istringstream whereStream(whereLine);
             std::getline(whereStream, next, ' ');
             whereStatement.arguments.push_back(next);
-            do{
-                do{
-                  whereStream >> next;
-                  tempString+=next;
-              } while(checkKeywords(next));
-              whereStatement.arguments.push_back(tempString);
-              tempString = "";
-            } while(whereStream);
+            while(whereStream >> next){
+              whereStatement.arguments.push_back(next);
+            }
         }
         newlineCounter++;
     } while(!endOfQuery(next, ';'));
 
 }
 
-void Query::getRelationalAlgebra(){/*
-  int i = 0;
-  int k = 0;
-  string next;
-  do{
-      if(i == 0){ //SELECT Clause
-        //std::cout << "1:" << next << std::endl; 
-        next = selectStatement.arguments[0];
-        //cout << "This is " << next  << " which is what this is\n";
-        if(next == "AVERAGE" || next == "MAX" || next == "MIN" || next == "COUNT" ){
-          relAlg.push("F");
-          relAlg.push(next);
-          //std::cout << "2:" << next << std::endl; 
-        }
-        else{
-          relAlg.push("[PROJECT]");
-          relAlg.push(next);
-          //std::cout << "3:" << next << std::endl; 
-          //print();
-        }
-        next = selectStatement.arguments[1];
-        //cout << "this is : " << next << " which I hope is Slim Shady\n";
-        while(!endOfQuery(next, '\n')){
-          if(next == "AVERAGE" || next == "MAX" || next == "MIN" || next == "COUNT" ){
-            relAlg.push("F");
-            relAlg.push(next);
-            //std::cout << "2:" << next << std::endl; 
-          }
-          if(next == "AS")
-          {
-            relAlg.push("RENAME ");
-            std::getline(iss, next,' ');
-          }
-          relAlg.push("(");
-          relAlg.push(next);
-          relAlg.push(")");
-          std::getline(iss, next,' ');
-          //std::cout << "4:" << next << std::endl; 
-        }
-        //cout << "EXITS WHILE\n";
-      }
-      
-      else if (i == 1){ //FROM Clause
-        std::getline(iss, next);
-        cout << next;
-        cout << "\nFROM SHOULD BE GONE DAMNIT.\n";
-      }
-
-      else if(i >= 2){ //WHERE Clause
-        //cout << "ENTERS WHERE\n";
-        std::getline(iss, next,' ');
-        if(k == 0){
-          k++;
-          relAlg.push("[SELECTION]");
-        }
-        
-        if(next == "SELECT"){ //Nested Query
-          i = 0; //Resets loop, but have to go through Projection
-          k = 0;
-          if(next == "AVERAGE" || next == "MAX" || next == "MIN" || next == "COUNT" ){
-            relAlg.push("F");
-            relAlg.push(next);
-          }
-          else
-            relAlg.push("[PROJECT]");
-          std::getline(iss, next,' ');
-          
-          while(next != " "){
-           if(next == "AS"){
-              relAlg.push("[RENAME]");
-              std::getline(iss, next,' ');
-            } //endif
-            relAlg.push("(");
-            relAlg.push(next);
-            relAlg.push(")");
-            std::getline(iss, next,' ');
-          } // end while
-        } //endif
-        
-        else if(next == "AND"){
-          relAlg.push("[JOIN]");
-        } //end elseif
-        
-        else if(next == "IN" || next == "CONTAINS" || next == "INTERSECT")
-          relAlg.push("[INTERSECTION]");
-        
-        else if(next == "HAVING" || next == "EXISTS")
-          relAlg.push("[DIVIDED BY]");
-        
-        else if(next == "NOTEXISTS")
-          relAlg.push("[SET DIFFERENCE]");
-        
-        else if(next == "EXCEPT")
-          relAlg.push("[SET DIFFERENCE]");
-        
-        else if(next == "GROUP BY"){
-          queue<string> temp = relAlg;
-          std::getline(iss, next, '\n');
-          for(unsigned int f = 0; f < temp.size(); f++)
-            relAlg.pop();
-          relAlg.push(next);
-          for(unsigned int c = 0; c < temp.size(); c++){
-            next = temp.front();
-            relAlg.push(next);
-          }
-          next = "\n";
-        }
-        
-        else if(next == "UNION")
-          relAlg.push("[UNION]");
-        
-        else{ //not a keyword
-          relAlg.push("(");
-          relAlg.push(next);
-          relAlg.push(")");
-        } // end else
-      } //end else if(WHERE CLAUSE)
-    i++;
-  }while(!endOfQuery(next, ';'));//true);
-  print();
-  */
-
-  return;
-}
 
 void Query::print()
 {
   string temp;
-  for(unsigned int i = 0; i < relAlg.size() + 1; i++){
+  while(!relAlg.empty()){
     temp = relAlg.front();
     relAlg.pop();
     cout << temp << " ";
   }
+
+  cout << endl;
   return;
 }
 
-void Query::printVector(){
-  for(int i = 0; i < selectStatement.arguments.size() - 1; i++){
-    std::cout << selectStatement.arguments[i] << " ";
-  }
+void Query::printTree(const string toPrint){
+  std::cout << "-------------------\n"
+            << "|                 |\n|\t"
+            << toPrint << std::endl
+            << "|                 |\n"
+            << "-------------------\n";
 }
 
 void Query::Algebra(){
   string arg = "";
   int counter = 0;
-  for(int i = 0; i < selectStatement.arguments.size() - 1; i++){
+  for(int i = 0; i < selectStatement.arguments.size(); i++){
     arg = selectStatement.arguments[i];
     if(i == 0){
       relAlg.push("[PROJECT]");
-      relAlg.push(selectStatement.arguments[i + 1]);
-      i++;
+      relAlg.push(selectStatement.arguments[i]);
     }
-    if(arg == "COUNT" || arg == "AVERAGE" || arg == "MIN" || arg == "MAX"){
+    else if(arg == "COUNT" || arg == "AVERAGE" || arg == "MIN" || arg == "MAX"){
       relAlg.push("[F]");
-      relAlg.push(arg);
+      relAlg.push(selectStatement.arguments[i]);
       relAlg.push(selectStatement.arguments[i+1]);
       i++;
     }
+    else
+      relAlg.push(selectStatement.arguments[i]);
   }
+  for(int i = 0; i < fromStatement.arguments.size(); i++){
+
+  }
+  for(int i = 0; i < whereStatement.arguments.size(); i++){
+    if(i == 0)
+      relAlg.push("[SELECTION] (");
+    
+    else if(whereStatement.arguments[i] == "SELECT") //NESTED QUERY
+      cout << "NOT NOW"; //Probably need to split the whereStatement vector apart from what it is now, 
+                         //and redistribute it through the getQuery function or something like that.
+    
+    else if(whereStatement.arguments[i] == "AND")
+      relAlg.push("[JOIN]");
+    
+    else if(whereStatement.arguments[i] == "IN" ||
+            whereStatement.arguments[i] == "CONTAINS" ||
+            whereStatement.arguments[i] == "INTERSECT")
+      relAlg.push("[INTERSECTION]");
+    
+    else if(whereStatement.arguments[i] == "HAVING" ||
+            whereStatement.arguments[i] == "EXISTS")
+      relAlg.push("[DIVIDE]");
+    
+    else if(whereStatement.arguments[i] == "EXCEPT" ||
+            whereStatement.arguments[i] == "NOTEXISTS")
+      relAlg.push("[SET DIFFERENCE]");
+    
+    else if(whereStatement.arguments[i] == "GROUP BY")
+    {                             //This needs some fixing up. it will replace[PROJECT] at the 
+      queue<string> temp = relAlg;//front. Also, there may be more than one attribute. Could be 
+      arg = whereStatement.arguments[i+1];  //a problem that may be difficult to fix.
+      for(unsigned int f = 0; f < temp.size(); f++)
+        relAlg.pop();
+      relAlg.push(arg);
+      for(unsigned int c = 0; c < temp.size(); c++){
+        arg = temp.front();
+        relAlg.push(arg);
+      }
+    }
+
+    else if(whereStatement.arguments[i] == "UNION")
+      relAlg.push("[UNION]");
+
+    else{
+      relAlg.push("(");
+      relAlg.push(whereStatement.arguments[i]);
+      //print();
+      relAlg.push(")");
+    }
+    //printVector();
+  }
+  cout << endl;
+  relAlg.push(")");
   print();
 
+}
+
+void Query::queryTree(std::vector<Schema> schemaList){
+  for(int i = 1; i < fromStatement.arguments.size(); i++){
+    for(int j = 0; j < schemaList.size(); j++){
+      if(fromStatement.arguments[i] == schemaList[j].getSchemaName()){
+        printTree(fromStatement.arguments[i]);
+      }
+    }
+  }
 }
 
 
