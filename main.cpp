@@ -8,7 +8,11 @@ int main(){
     tempSchemas.push_back(tempSchema);
 
     Query testquery;
-    //testquery.getQuery();
-    testquery.getRelationalAlgebra();
+    testquery.getQuery();
+    std::cout << testquery.whereStatement.arguments[2];
+    std::cout << testquery.whereStatement.arguments[3];
+    std::cout << testquery.whereStatement.arguments[4];
+    std::cout << testquery.whereStatement.arguments[5];
+
     return 0;
 }

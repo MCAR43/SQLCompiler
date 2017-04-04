@@ -6,6 +6,16 @@ Query::Query(){
     fin.clear();
     fin.open(INPUTFILESQL.c_str());
     std::getline(fin, raw_query, ';');
+    raw_query.append(";");
+
+}
+
+bool Query::checkKeywords(const string keyword){
+    for(int i = 0; i < 18; i++){ //18 is the amount of keywords, don'tbe a dumbass fis this later'
+        if(keyword == KEYWORDS[i])
+          return true;
+    }
+    return false;
 }
 
 bool Query::endOfQuery(const string stringToCheck, const char charToEnd){
@@ -20,20 +30,40 @@ bool Query::endOfQuery(const string stringToCheck, const char charToEnd){
 
 void Query::getQuery(){
     std::istringstream iss(raw_query);
+    string selectLine, fromLine, whereLine, tempString;
     int newlineCounter = 0;
     string next;
     do{
         if(newlineCounter == 0){
-            std::getline(iss, SELECTION, '\n');
-            next = SELECTION;
+            std::getline(iss,selectLine, '\n');
+            std::istringstream selectStream(selectLine);
+            std::getline(selectStream, selectStatement.selectSymbol, ' ');
+            do{
+              std::getline(selectStream, next, ',');
+              selectStatement.arguments.push_back(next);
+            } while(selectStream);
         }
         else if(newlineCounter == 1){
-            std::getline(iss, FROM, '\n');
-            next = FROM;
+            std::getline(iss,fromLine, '\n');
+            std::istringstream fromStream(fromLine);
+            std::getline(fromStream, fromStatement.fromSymbol, ' ');
+            do{
+              std::getline(fromStream, next, ',');
+              fromStatement.arguments.push_back(next);
+            } while(fromStream);
         }
         else if(newlineCounter == 2){
-            std::getline(iss, WHERE, '\n');
-            next = WHERE;
+            std::getline(iss,whereLine, '\n');
+            std::istringstream whereStream(whereLine);
+            std::getline(whereStream, whereStatement.whereSymbol, ' ');
+            do{
+                do{
+                  whereStream >> next;
+                  tempString+=next;
+              } while(checkKeywords(next));
+              whereStatement.arguments.push_back(tempString);
+              tempString = "";
+            } while(whereStream);
         }
         newlineCounter++;
     } while(!endOfQuery(next, ';'));

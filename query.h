@@ -10,6 +10,21 @@ using std::string;
 const string INPUTFILESQL = "testinputSQL.dat";
 const string KEYWORDS[18] = {"SELECT", "FROM", "WHERE", "AND", "AS", "INTERSECT", "UNION", "IN", "GROUP BY", "MAX", "MIN",
 "AVERAGE", "HAVING", "EXCEPT", "COUNT", "EXISTS", "NOTEXISTS", "CONTAINS"};
+struct SELECT{
+    string selectSymbol;
+    std::vector<string> arguments;
+};
+
+struct FROM{
+    string fromSymbol;
+    std::vector<string> arguments;
+};
+
+struct WHERE{
+    string whereSymbol;
+    std::vector<string> arguments;
+};
+
 
 class Query{
 public: 
@@ -18,11 +33,14 @@ public:
     bool endOfQuery(const string stringToCheck, const char charToEnd);
     void getRelationalAlgebra();
     void print();
+    bool checkKeywords(const string keyword);
+    WHERE whereStatement;
+    FROM fromStatement;
+    SELECT selectStatement;
     
 
 private:
     string raw_query;
-    string SELECTION, FROM, WHERE;
     std::queue<string> relAlg;
 
 };
