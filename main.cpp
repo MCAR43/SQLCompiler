@@ -9,10 +9,13 @@ int main(){
 
     Query testquery;
     testquery.getQuery();
-    std::cout << testquery.whereStatement.arguments[2];
-    std::cout << testquery.whereStatement.arguments[3];
-    std::cout << testquery.whereStatement.arguments[4];
-    std::cout << testquery.whereStatement.arguments[5];
+    //for(int i = 0; i < testquery.selectStatement.arguments.size() - 1; i++){
+      //  std::cout << testquery.selectStatement.arguments[i];
+   // }
+    testquery.Algebra();
+
+
+
 
     return 0;
 }
