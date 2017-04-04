@@ -23,11 +23,15 @@ struct WHERE{
     std::vector<string> arguments;
 };
 
+struct OPERATOR{
+    std::vector<string> arguments;
+};
+
 
 class Query{
 public: 
     Query();
-    void getQuery();
+    void printVector();
     bool endOfQuery(const string stringToCheck, const char charToEnd);
     void Algebra();
     void print();
@@ -37,6 +41,7 @@ public:
     WHERE whereStatement;
     FROM fromStatement;
     SELECT selectStatement;
+    OPERATOR operatorStatement;
     
 
 private:

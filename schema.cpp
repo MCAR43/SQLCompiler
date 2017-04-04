@@ -5,6 +5,7 @@ Schema::Schema(){
     schemaList.clear();
 }
 
+
 bool Schema::endOfSchema(const string stringToCheck){
     for(int i = 0; i < stringToCheck.length(); i++){
         if(stringToCheck[i] == ')')
@@ -14,14 +15,18 @@ bool Schema::endOfSchema(const string stringToCheck){
     return false;
 }
 
-void Schema::getSchemaInput(){
+void Schema::getSchemaInput(const int numIter){
     int i = 0;
-    string next;
+    string next, trashString;
     schemaVar tempVar;
     std::ifstream fin;
-
     fin.clear();
     fin.open(INPUTFILE.c_str());
+
+    for(int i = 0; i < numIter - 1; i++){
+        std::getline(fin, trashString, ';');
+    }
+
     std::getline(fin, schemaName, '('); //Retrieves the name of the Schema
     do{
         schemaList.push_back(tempVar);

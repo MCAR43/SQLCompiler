@@ -14,13 +14,10 @@ struct schemaVar{
     string varType;
 };
 
-
-
-
 class Schema{
 public:
     Schema();
-    void getSchemaInput();
+    void getSchemaInput(const int numIter);
     string getSchemaName();
     bool endOfSchema(const string stringToCheck);
 private:

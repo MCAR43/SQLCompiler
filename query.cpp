@@ -30,7 +30,7 @@ bool Query::endOfQuery(const string stringToCheck, const char charToEnd){
 
 void Query::getQuery(){
     std::istringstream iss(raw_query);
-    string selectLine, fromLine, whereLine, tempString, trashString;
+    string selectLine, fromLine, whereLine, extraLine, tempString, trashString;
     int newlineCounter = 0;
     int embeddedCounter = 0;
     string next;
@@ -60,6 +60,15 @@ void Query::getQuery(){
             while(whereStream >> next){
               whereStatement.arguments.push_back(next);
             }
+        }
+        else{
+            std::getline(iss, extraLine, '\n');
+            std::istringstream extraStream(extraLine);
+            std::getline(iss, next, ' ');
+            while(extraStream >> next){
+              operatorStatement.arguments.push_back(next);
+            }
+
         }
         newlineCounter++;
     } while(!endOfQuery(next, ';'));
@@ -164,10 +173,13 @@ void Query::Algebra(){
 }
 
 void Query::queryTree(std::vector<Schema> schemaList){
-  for(int i = 1; i < fromStatement.arguments.size(); i++){
-    for(int j = 0; j < schemaList.size(); j++){
-      if(fromStatement.arguments[i] == schemaList[j].getSchemaName()){
-        printTree(fromStatement.arguments[i]);
+  for(int i = 0; i < schemaList.size(); i++){
+    std::cout << schemaList[i].getSchemaName();
+    for(int j = 0; j < fromStatement.arguments.size(); j++){
+      //std::cout << "FROM: " << fromStatement.arguments[i] << std::endl;
+      //std::cout << "SCHEMANAME: " << schemaList[i].getSchemaName() << std::endl;
+      if(fromStatement.arguments[j] == schemaList[i].getSchemaName()){
+        printTree(fromStatement.arguments[j]);
       }
     }
   }

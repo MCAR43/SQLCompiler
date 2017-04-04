@@ -1,2 +1,4 @@
-Reserves(sid:integer,bid:integer,day:date)
+Reserves(sid:integer,bid:integer,day:date);
+Sailors(sid:integer, sname:string, rating:integer, age:real);
+Boats(bid:integer, bname:string, color:string);
 
