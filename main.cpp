@@ -4,8 +4,7 @@
 int numStatements();
 int main(){
     std::vector<Schema> schemaInput;
-    std::vector<Query> queryInput;
-    std::string next;
+    Query queryInput;
     Schema tempSchema;
     Query tempQuery;
     for(int i = 1; i <= numStatements(); i++){
@@ -13,22 +12,25 @@ int main(){
         schemaInput[i - 1].getSchemaInput(i);
     }
 
-    queryInput.push_back(tempQuery);
-    queryInput[0].getQuery();
 
-   // queryInput[0].queryTree(schemaInput);
+
+    queryInput.getQuery();
+    std::cout << "SQL QUERY:\n" << queryInput.raw_query << std::endl;
+    std::cout << "\nRELATIONAL ALGEBRA:\n";
+    Algebra(queryInput);
+    std::cout << "QUERY TREE:\n";
+    queryInput.queryTree(schemaInput);
+
+
+    for(int i = 0; i < queryInput.whereStatement.arguments.size(); i++){
+        std::cout << queryInput.whereStatement.arguments[i];
+    }
     
 
     return 0;
 }
 
 
-
-
-
-
-
-//So unoptimized i might die
 int numStatements(){
     int counter = 0;
     string next;

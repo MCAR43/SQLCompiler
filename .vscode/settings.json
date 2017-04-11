@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "vector": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "exception": "cpp",
+        "new": "cpp",
+        "typeinfo": "cpp"
     }
 }

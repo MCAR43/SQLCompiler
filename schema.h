@@ -18,6 +18,7 @@ class Schema{
 public:
     Schema();
     void getSchemaInput(const int numIter);
+    void renameSchema(const string toRename);
     string getSchemaName();
     bool endOfSchema(const string stringToCheck);
 private:

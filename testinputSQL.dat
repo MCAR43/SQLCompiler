@@ -1,4 +1,7 @@
-SELECT Sname, bname, fname
-FROM Sailors AS S, Reserves AS R
-WHERE R.sid = S.sid AND R.bid = 103
-GROUP BY S.rating;
+SELECT s.sname
+FROM Sailors AS S
+WHERE S.sid = 103
+UNION (
+SELECT s.sname
+FROM Sailors AS S
+WHERE S.age > 50);

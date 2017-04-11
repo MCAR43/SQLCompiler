@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <stack>
 #include "schema.h"
 using std::string;
 const string INPUTFILESQL = "testinputSQL.dat";
@@ -21,6 +22,7 @@ struct FROM{
 
 struct WHERE{
     std::vector<string> arguments;
+    string rawWhereLine;
 };
 
 struct OPERATOR{
@@ -31,22 +33,25 @@ struct OPERATOR{
 class Query{
 public: 
     Query();
+    Query(const string newraw_query);
+    void getQuery();
     void printVector();
     bool endOfQuery(const string stringToCheck, const char charToEnd);
-    void Algebra();
+    void Algebra(Query query);
     void print();
-    void printTree(const string toPrint);
+    void printStack(std::stack<string> myStack);
     void queryTree(std::vector<Schema> schema);
     bool checkKeywords(const string keyword);
     WHERE whereStatement;
     FROM fromStatement;
     SELECT selectStatement;
     OPERATOR operatorStatement;
+    string raw_query;
     
 
 private:
-    string raw_query;
     std::queue<string> relAlg;
+    std::stack<string> queryStack;
 
 };
 

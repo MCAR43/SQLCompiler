@@ -5,7 +5,7 @@ Schema::Schema(){
     schemaList.clear();
 }
 
-
+//Checks to see if it is the end of the Schema
 bool Schema::endOfSchema(const string stringToCheck){
     for(int i = 0; i < stringToCheck.length(); i++){
         if(stringToCheck[i] == ')')
@@ -15,6 +15,8 @@ bool Schema::endOfSchema(const string stringToCheck){
     return false;
 }
 
+//Gets the input of the schema and parses it into its variables, and variable varType
+//aka BID:integer = var:vartype
 void Schema::getSchemaInput(const int numIter){
     int i = 0;
     string next, trashString;
@@ -45,4 +47,8 @@ void Schema::getSchemaInput(const int numIter){
 
 string Schema::getSchemaName(){
     return schemaName;
+}
+
+void Schema::renameSchema(const string toRename){
+    schemaName = toRename;
 }
