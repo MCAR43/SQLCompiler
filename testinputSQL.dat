@@ -1,7 +1,8 @@
+
 SELECT s.sname
 FROM Sailors AS S
 WHERE S.sid = 103
-UNION (
+UNION
 SELECT s.sname
 FROM Sailors AS S
-WHERE S.age > 50);
+WHERE S.age > 50;

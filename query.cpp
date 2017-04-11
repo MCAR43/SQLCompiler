@@ -13,6 +13,7 @@ Query::Query(){
 Query::Query(const string newraw_query){
   raw_query = newraw_query;
   raw_query.append(";");
+  //cout << "\n\n\n\n\n\n\n" << raw_query << endl;
 }
 
 //checks the string passed to see if it matches any SQL keywords
@@ -77,13 +78,12 @@ void Query::getQuery(){
             std::istringstream extraStream(extraLine);
             //std::getline(iss, next, ' ');
             while(extraStream >> next){
-              operatorStatement.arguments.push_back(next);
+             whereStatement.arguments.push_back(next);
             }
 
         }
         newlineCounter++;
     } while(!endOfQuery(next, ';'));
-
 }
 
 //Prints the relational Algebra
@@ -115,8 +115,10 @@ void Query::printStack(std::stack<string> myStack){
 
 void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
   string arg = "";
-
+  bool nested = false;
+  
   for(int i = 0; i < Q.selectStatement.arguments.size(); i++){ //SELECT CLAUSE
+    cout << Q.selectStatement.arguments[i] << endl << endl;
     arg = Q.selectStatement.arguments[i];
     //SELECT TOKEN
     if(i == 0){
@@ -139,26 +141,34 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
 
   for(int i = 0; i < Q.whereStatement.arguments.size(); i++){ //WHERE CLAUSE
     //WHERE TOKEN
+  //  cout << Q.whereStatement.arguments[i];
     if(i == 0)
       relAlg.push("[SELECTION] (");
     
     else if(Q.whereStatement.arguments[i] == "SELECT"){ //NESTED QUERY
       string newraw_query;
       for(int c = i; c < Q.whereStatement.arguments.size(); c++){ //MAKES NEW QUERY WITH ONLY THE SUBQUERIES ELEMENTS
-        newraw_query.append(Q.whereStatement.arguments[c-1]);
+        //newraw_query.append(Q.whereStatement.arguments[c-1]);
         //IF IT IS A MAJOR KEY WORD, ADD A NEW LINE
+        //cout << endl << endl << Q.whereStatement.arguments[c];
         if(Q.whereStatement.arguments[c] == "SELECT" ||
            Q.whereStatement.arguments[c] == "FROM" ||
            Q.whereStatement.arguments[c] == "WHERE" ||
-           Q.whereStatement.arguments[c] == "GROUP BY" )
+           Q.whereStatement.arguments[c] == "GROUP BY" ){
           newraw_query.append("\n");
-        else   //OTHERWISE, A SPACE
-          newraw_query.append(" "); 
+          newraw_query.append(Q.whereStatement.arguments[c]);
+        }
+        else{   //OTHERWISE, A SPACE
+          newraw_query.append(" ");
+          newraw_query.append(Q.whereStatement.arguments[c]); 
+        }
       }
+      //cout << endl << "NEW RAW FUCKING QUERY BITCHEZ     " << newraw_query << endl;
       //RUNS THE FUNCTION AGAIN, OUR SOLUTION FOR RECURSION
       Query nestedQuery(newraw_query);
       nestedQuery.getQuery();
-      Algebra(newraw_query);  
+      Algebra(nestedQuery);
+//      nested = true;
     }  
     
     //AND STATEMENTS
@@ -213,6 +223,8 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
       relAlg.push(whereStatement.arguments[i]);
       relAlg.push(")");
     }
+    if(nested)
+      i = whereStatement.arguments.size();
   }
   relAlg.push(")");
   print();

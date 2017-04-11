@@ -17,14 +17,14 @@ int main(){
     queryInput.getQuery();
     std::cout << "SQL QUERY:\n" << queryInput.raw_query << std::endl;
     std::cout << "\nRELATIONAL ALGEBRA:\n";
-    Algebra(queryInput);
+    queryInput.Algebra(queryInput);
     std::cout << "QUERY TREE:\n";
     queryInput.queryTree(schemaInput);
 
 
-    for(int i = 0; i < queryInput.whereStatement.arguments.size(); i++){
+    /*for(int i = 0; i < queryInput.whereStatement.arguments.size(); i++){
         std::cout << queryInput.whereStatement.arguments[i];
-    }
+    }*/
     
 
     return 0;
