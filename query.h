@@ -27,6 +27,7 @@ struct WHERE{
 
 struct OPERATOR{
     std::vector<string> arguments;
+    std::string opType;
 };
 
 
@@ -46,7 +47,8 @@ public:
     FROM fromStatement;
     SELECT selectStatement;
     OPERATOR operatorStatement;
-    string raw_query;
+    string raw_query, nestedPortion;
+    bool isNested;
     
 
 private:

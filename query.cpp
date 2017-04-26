@@ -7,6 +7,8 @@ Query::Query(){
     fin.open(INPUTFILESQL.c_str());
     std::getline(fin, raw_query, ';');
     raw_query.append(";");
+    isNested = false;
+    nestedPortion = "";
 
 }
 
@@ -39,51 +41,7 @@ bool Query::endOfQuery(const string stringToCheck, const char charToEnd){
 //A function to take in the entire query, split it into three seperate objects, SELECT, FROM, and WHERE
 //and then parse those objects into arguments
 void Query::getQuery(){
-    std::istringstream iss(raw_query);
-    string selectLine, fromLine, whereLine, extraLine, tempString, trashString;
-    int newlineCounter = 0;
-    int embeddedCounter = 0;
-    string next;
-    do{
-        if(newlineCounter == 0){
-            std::getline(iss,selectLine, '\n');
-            std::istringstream selectStream(selectLine);
-            std::getline(selectStream, next, ' ');
-            while(selectStream >> next){
-              selectStatement.arguments.push_back(next);
-            }
-        }
-        else if(newlineCounter == 1){
-            std::getline(iss,fromLine, '\n');
-            std::istringstream fromStream(fromLine);
-            std::getline(fromStream, next, ' ');
-            fromStatement.arguments.push_back(next);
-            while(fromStream >> next){
-              fromStatement.arguments.push_back(next);
-            }
-        }
-        else if(newlineCounter == 2){
-            std::getline(iss,whereLine, '\n');
-            whereStatement.rawWhereLine = whereLine;
-            std::istringstream whereStream(whereLine);
-            std::getline(whereStream, next, ' ');
-            whereStatement.arguments.push_back(next);
-            while(whereStream >> next){
-              whereStatement.arguments.push_back(next);
-            }
-        }
-        else{
-            std::getline(iss, extraLine, '\n');
-            std::istringstream extraStream(extraLine);
-            //std::getline(iss, next, ' ');
-            while(extraStream >> next){
-              operatorStatement.arguments.push_back(next);
-            }
-
-        }
-        newlineCounter++;
-    } while(!endOfQuery(next, ';'));
-
+  
 }
 
 //Prints the relational Algebra

@@ -2,30 +2,25 @@
 #include "schema.h"
 
 int numStatements();
+void printQueryLine(Query query, const int lineNum);
 int main(){
     std::vector<Schema> schemaInput;
+    std::vector<Query> nestedQueries;
+    Query tempQuery;
     Query queryInput;
     Schema tempSchema;
-    Query tempQuery;
+    nestedQueries.push_back(queryInput);
+    
+
+
+    //This is getting the Schema 
+    //Initial push_back of the schema is to not overflow
+
     for(int i = 1; i <= numStatements(); i++){
         schemaInput.push_back(tempSchema);
         schemaInput[i - 1].getSchemaInput(i);
     }
 
-
-
-    queryInput.getQuery();
-    std::cout << "SQL QUERY:\n" << queryInput.raw_query << std::endl;
-    std::cout << "\nRELATIONAL ALGEBRA:\n";
-    queryInput.Algebra(queryInput);
-    std::cout << "QUERY TREE:\n";
-    queryInput.queryTree(schemaInput);
-
-
-    for(int i = 0; i < queryInput.whereStatement.arguments.size(); i++){
-        std::cout << queryInput.whereStatement.arguments[i];
-    }
-    
 
     return 0;
 }
@@ -44,4 +39,10 @@ int numStatements(){
     }
     
     return counter;
+}
+
+void printQueryLine(Query query, const int lineNum){
+    for(int i = 0; i < query.whereStatement.arguments.size(); i++){
+        std::cout << query.whereStatement.arguments[i];
+    }
 }
