@@ -17,7 +17,7 @@ int main(){
     queryInput.getQuery();
     std::cout << "SQL QUERY:\n" << queryInput.raw_query << std::endl;
     std::cout << "\nRELATIONAL ALGEBRA:\n";
-    Algebra(queryInput);
+    queryInput.Algebra(queryInput);
     std::cout << "QUERY TREE:\n";
     queryInput.queryTree(schemaInput);
 
