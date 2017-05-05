@@ -40,7 +40,7 @@ public:
     void Algebra(Query query);
     void print();
     void printStack(std::stack<string> myStack);
-    void queryTree(std::vector<Schema> schema);
+    void queryTree(std::vector<Schema> schema, Query Q);
     bool checkKeywords(const string keyword);
     WHERE whereStatement;
     FROM fromStatement;

@@ -265,44 +265,77 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
 
 //Takes an input of SchemaList (Which is just the list of schema names)
 //Checks the SELECT, FROM, and WHERE clauses and translates them into a query Tree
-void Query::queryTree(std::vector<Schema> schemaList){
+void Query::queryTree(std::vector<Schema> schemaList, Query Q){
   string toCheck;
   int embeddedCounter = 0;
+  bool nested;
   string toPush, toPushSelect, trashString, toPushWhere, next;
-  std::stack<string> tempStack;
+  std::stack<string> fromStack, whereStack, selectStack;
+
 
   //FROM STATEMENT PROCESSING 
-  for(int i = 1; i < fromStatement.arguments.size(); i++){
+  for(int i = 1; i < Q.fromStatement.arguments.size(); i++){
     for(int j = 0; j < schemaList.size(); j++){
         toCheck = schemaList[j].getSchemaName();
         if(j > 0){
           toCheck.erase(toCheck.begin(), toCheck.begin() + 1);
         }
-        if(fromStatement.arguments[i] == toCheck){
-          queryStack.push(toCheck);
+        if(Q.fromStatement.arguments[i] == toCheck){
+          fromStack.push(toCheck);
         }
     }
   }
 
   //WHERE STATEMENT PROCESSING
-  for(int i = 1; i < whereStatement.arguments.size(); i++){
-    next = whereStatement.arguments[i];
+  for(int i = 1; i < Q.whereStatement.arguments.size(); i++){
+    next = Q.whereStatement.arguments[i];
     if(checkKeywords(next)){
-      queryStack.push(toPushWhere);
+      whereStack.push(toPushWhere);
       toPushWhere = "";
     }
     else{
       toPushWhere+=next;
     }
   }
-  queryStack.push(toPushWhere);
+  whereStack.push(toPushWhere);
 
   //SELECT STATEMENT PROCESSING
-  for(int i = 0; i < selectStatement.arguments.size(); i++){  
-    toPushSelect+=selectStatement.arguments[i];
+  for(int i = 0; i < Q.selectStatement.arguments.size(); i++){  
+    toPushSelect+=Q.selectStatement.arguments[i];
   }
-  queryStack.push("[PI]" + toPushSelect);
-  printStack(queryStack);
+  selectStack.push("[PI]" + toPushSelect);
+  
+
+  for(int i = 0; i < Q.whereStatement.arguments.size(); i++){
+  if(Q.whereStatement.arguments[i] == "SELECT"){ //NESTED QUERY
+      string newraw_query;
+      for(int c = i; c < Q.whereStatement.arguments.size(); c++){ //MAKES NEW QUERY WITH ONLY THE SUBQUERIES ELEMENTS
+        //IF IT IS A MAJOR KEY WORD, ADD A NEW LINE
+        if(Q.whereStatement.arguments[c] == "SELECT" ||
+           Q.whereStatement.arguments[c] == "FROM" ||
+           Q.whereStatement.arguments[c] == "WHERE" ||
+           Q.whereStatement.arguments[c] == "GROUP BY" ){
+          newraw_query.append("\n");
+          newraw_query.append(Q.whereStatement.arguments[c]);
+        }
+        else{   //OTHERWISE, A SPACE
+          newraw_query.append(" ");
+          newraw_query.append(Q.whereStatement.arguments[c]); 
+        }
+      }
+      //RUNS THE FUNCTION AGAIN, OUR SOLUTION FOR RECURSION
+      Query nestedQuery(newraw_query);
+      nestedQuery.getQuery();
+      i = Q.whereStatement.arguments.size();
+      queryTree(schemaList, nestedQuery);
+      nested = true;
+    } 
+  }
+
+  printStack(fromStack);
+  printStack(whereStack);
+  printStack(selectStack);
+
 }
 
 

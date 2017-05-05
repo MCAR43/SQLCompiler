@@ -19,7 +19,7 @@ int main(){
     std::cout << "\nRELATIONAL ALGEBRA:\n";
     queryInput.Algebra(queryInput);
     std::cout << "QUERY TREE:\n";
-    queryInput.queryTree(schemaInput);
+    queryInput.queryTree(schemaInput, queryInput);
 
 
     /*for(int i = 0; i < queryInput.whereStatement.arguments.size(); i++){
