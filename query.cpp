@@ -19,7 +19,6 @@ Query::Query(const string newraw_query){
 //checks the string passed to see if it matches any SQL keywords
 bool Query::checkKeywords(const string keyword){
     for(int i = 0; i < 18; i++){ //18 is the amount of keywords, don'tbe a dumbass fis this later'
-        //if(keyword.find(KEYWORDS[i]))
         if(keyword == KEYWORDS[i])
           return true;
     }
@@ -43,47 +42,79 @@ void Query::getQuery(){
     std::istringstream iss(raw_query);
     string selectLine, fromLine, whereLine, extraLine, tempString, trashString;
     int newlineCounter = 0;
+    static int timesThrough = 0;
     int embeddedCounter = 0;
     string next;
     do{
         if(newlineCounter == 0){
             std::getline(iss,selectLine, '\n');
+            label:
             std::istringstream selectStream(selectLine);
             std::getline(selectStream, next, ' ');
+            embeddedCounter++;
             while(selectStream >> next){
               selectStatement.arguments.push_back(next);
+              embeddedCounter++;
             }
         }
         else if(newlineCounter == 1){
             std::getline(iss,fromLine, '\n');
+            label2:
             std::istringstream fromStream(fromLine);
             std::getline(fromStream, next, ' ');
-            fromStatement.arguments.push_back(next);
-            while(fromStream >> next){
+            if(next == "SELECT"){
+              selectLine = fromLine;
+              goto label;
+            }
+            if(timesThrough == 0)
               fromStatement.arguments.push_back(next);
+            embeddedCounter++;
+            while(fromStream >> next){
+              if(next!="FROM")
+                fromStatement.arguments.push_back(next);
+              embeddedCounter++;
             }
         }
         else if(newlineCounter == 2){
             std::getline(iss,whereLine, '\n');
-            whereStatement.rawWhereLine = whereLine;
+            label3:
+            //whereStatement.rawWhereLine = whereLine;
             std::istringstream whereStream(whereLine);
             std::getline(whereStream, next, ' ');
+            if(next == "FROM"){
+              fromStatement.arguments.push_back(next);
+              fromLine = whereLine;
+              goto label2;
+            }
             whereStatement.arguments.push_back(next);
+            embeddedCounter++;
             while(whereStream >> next){
               whereStatement.arguments.push_back(next);
+              embeddedCounter++;
             }
         }
         else{
-            std::getline(iss, extraLine, '\n');
+            std::getline(iss, extraLine, ';');
+            extraLine.append(";");
             std::istringstream extraStream(extraLine);
-            //std::getline(iss, next, ' ');
+            std::getline(iss, next, ' ');
+            if(next == "WHERE"){
+              whereStatement.arguments.push_back(next);
+              getline(extraStream, whereLine, '\n');
+              goto label3;
+            }
+            whereStatement.arguments.push_back(next);
+            embeddedCounter++;
             while(extraStream >> next){
-             whereStatement.arguments.push_back(next);
+              embeddedCounter++;
+              whereStatement.arguments.push_back(next);
             }
 
         }
         newlineCounter++;
+  
     } while(!endOfQuery(next, ';'));
+    timesThrough++;
 }
 
 //Prints the relational Algebra
@@ -118,7 +149,7 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
   bool nested = false;
   
   for(int i = 0; i < Q.selectStatement.arguments.size(); i++){ //SELECT CLAUSE
-    cout << Q.selectStatement.arguments[i] << endl << endl;
+    //cout << Q.selectStatement.arguments[i] << endl << endl;
     arg = Q.selectStatement.arguments[i];
     //SELECT TOKEN
     if(i == 0){
@@ -134,23 +165,23 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
     } 
     //EVERYTHING ELSE
     else
-     relAlg.push(Q.selectStatement.arguments[i-1]);
+      relAlg.push(Q.selectStatement.arguments[i]);
   }
 
   //NO FROM CLAUSE BECAUSE IT IS UNNECESSARY FOR THE RELATIONAL ALGEBRA
 
   for(int i = 0; i < Q.whereStatement.arguments.size(); i++){ //WHERE CLAUSE
     //WHERE TOKEN
-  //  cout << Q.whereStatement.arguments[i];
-    if(i == 0)
+    if(i == 0 || Q.whereStatement.arguments[i] == ";"){
       relAlg.push("[SELECTION] (");
-    
+      if(Q.whereStatement.arguments[i] == ";"){
+        i++;
+      }
+    }
     else if(Q.whereStatement.arguments[i] == "SELECT"){ //NESTED QUERY
       string newraw_query;
       for(int c = i; c < Q.whereStatement.arguments.size(); c++){ //MAKES NEW QUERY WITH ONLY THE SUBQUERIES ELEMENTS
-        //newraw_query.append(Q.whereStatement.arguments[c-1]);
         //IF IT IS A MAJOR KEY WORD, ADD A NEW LINE
-        //cout << endl << endl << Q.whereStatement.arguments[c];
         if(Q.whereStatement.arguments[c] == "SELECT" ||
            Q.whereStatement.arguments[c] == "FROM" ||
            Q.whereStatement.arguments[c] == "WHERE" ||
@@ -163,39 +194,39 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
           newraw_query.append(Q.whereStatement.arguments[c]); 
         }
       }
-      //cout << endl << "NEW RAW FUCKING QUERY BITCHEZ     " << newraw_query << endl;
       //RUNS THE FUNCTION AGAIN, OUR SOLUTION FOR RECURSION
       Query nestedQuery(newraw_query);
       nestedQuery.getQuery();
+      i = Q.whereStatement.arguments.size();
       Algebra(nestedQuery);
-//      nested = true;
+      nested = true;
     }  
     
     //AND STATEMENTS
-    else if(whereStatement.arguments[i] == "AND")
+    else if(Q.whereStatement.arguments[i] == "AND")
       relAlg.push("[JOIN]");
     
     //INTERSECTION OR EQUIVALENT KEYWORD STATEMENTS
-    else if(whereStatement.arguments[i] == "IN" ||
-            whereStatement.arguments[i] == "CONTAINS" ||
-            whereStatement.arguments[i] == "INTERSECT")
+    else if(Q.whereStatement.arguments[i] == "IN" ||
+            Q.whereStatement.arguments[i] == "CONTAINS" ||
+            Q.whereStatement.arguments[i] == "INTERSECT")
       relAlg.push("[INTERSECTION]");
     
     //DIVISION STATEMENTS
-    else if(whereStatement.arguments[i] == "HAVING" ||
-            whereStatement.arguments[i] == "EXISTS")
+    else if(Q.whereStatement.arguments[i] == "HAVING" ||
+            Q.whereStatement.arguments[i] == "EXISTS")
       relAlg.push("[DIVIDE]");
    
     //SET DIFFERENCE STATEMENTS
-    else if(whereStatement.arguments[i] == "EXCEPT" ||
-            whereStatement.arguments[i] == "NOTEXISTS")
+    else if(Q.whereStatement.arguments[i] == "EXCEPT" ||
+            Q.whereStatement.arguments[i] == "NOTEXISTS")
       relAlg.push("[SET DIFFERENCE]");
     
     //GROUPING ATTRIBUTES
-    else if(whereStatement.arguments[i] =="GROUP" && whereStatement.arguments[i+1] == "BY")
+    else if(Q.whereStatement.arguments[i] =="GROUP" && Q.whereStatement.arguments[i+1] == "BY")
     {                    
       queue<string> temp; 
-      arg = whereStatement.arguments[i+2];
+      arg = Q.whereStatement.arguments[i+2];
       int size = relAlg.size();
       //FINDS WHERE [F] IS IN THE ORIGINAL STRING, PUTS THE ATTRIBUTE IN FRONT OF IT
       for(unsigned int f = 0; f < size; f++){
@@ -204,7 +235,6 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
         temp.push(relAlg.front());
         relAlg.pop();
       }
-      cout << endl << endl;
       //THEN APPENDS THE OLD STRING ONTO THE NEW ONE WITH THE GROUPING ATTRIBUTES
       for(unsigned int c = 0; c < size+1; c++){
         arg = temp.front();
@@ -214,17 +244,17 @@ void Query::Algebra(Query Q){ //RELATIONAL ALGEBRA FUNCTION
       i++;
     }
     //UNION STATEMENTS
-    else if(whereStatement.arguments[i] == "UNION")
+    else if(Q.whereStatement.arguments[i] == "UNION")
       relAlg.push("[UNION]");
       
     //ANYTHING ELSE
     else{
       relAlg.push("(");
-      relAlg.push(whereStatement.arguments[i]);
+      relAlg.push(Q.whereStatement.arguments[i]);
       relAlg.push(")");
     }
     if(nested)
-      i = whereStatement.arguments.size();
+      i = Q.whereStatement.arguments.size();
   }
   relAlg.push(")");
   print();

@@ -1,8 +1,10 @@
-
-SELECT s.sname
-FROM Sailors AS S
-WHERE S.sid = 103
-UNION
-SELECT s.sname
-FROM Sailors AS S
-WHERE S.age > 50;
+SELECT S.sname
+FROM Sailors
+WHERE Sailor.sid 
+IN
+SELECT Reserves.bid, Reserves.sid
+FROM     Reserves    
+WHERE Reserves CONTAINS 
+SELECT Boats.bid      
+FROM  Boats
+WHERE  Boats.name  =  ‘interlake’;
